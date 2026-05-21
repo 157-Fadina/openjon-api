@@ -1,0 +1,95 @@
+const express = require('express');
+const authMiddleware = require('../../middlewares/authMiddleware');
+
+const companiesApi = (service, validator) => {
+  const router = express.Router();
+
+  router.post('/', authMiddleware, async (req, res, next) => {
+    try {
+      validator.validateCompanyPayload(req.body);
+      const companyId = await service.addCompany(req.body);
+
+      res.status(201).json({
+        status: 'success',
+        message: 'Perusahaan berhasil ditambahkan',
+        data: { 
+          companyId: companyId,
+          id: companyId,
+          company: { id: companyId },
+          addedCompany: { id: companyId } 
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/', async (req, res, next) => {
+    try {
+      const companies = await service.getCompanies();
+      res.status(200).json({
+        status: 'success',
+        data: { companies },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const company = await service.getCompanyById(id);
+
+      res.status(200).json({
+        status: 'success',
+        data: {
+          id: company.id,
+          name: company.name,
+          description: company.description,
+          location: company.location,
+          company: company
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put('/:id', authMiddleware, async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      
+      await service.getCompanyById(id); 
+      
+      validator.validateCompanyPayload(req.body); 
+      
+      await service.editCompanyById(id, req.body);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Perusahaan berhasil diperbarui',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.delete('/:id', authMiddleware, async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      await service.deleteCompanyById(id);
+
+      res.status(200).json({
+        status: 'success',
+        message: 'Perusahaan berhasil dihapus',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  return router;
+};
+
+module.exports = companiesApi;
