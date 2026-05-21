@@ -7,7 +7,7 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       primaryKey: true,
     },
-    fullname: {
+    name: {
       type: 'TEXT',
       notNull: true,
     },

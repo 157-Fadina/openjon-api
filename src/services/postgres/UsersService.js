@@ -10,15 +10,15 @@ class UsersService {
     this._pool = new Pool();
   }
 
-  async addUser({ name, email, password, role }) {
+  async addUser({ name, email, password }) {
     await this.verifyNewEmail(email);
 
     const id = `user-${nanoid(16)}`;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const query = {
-      text: 'INSERT INTO users(id, name, email, password, role) VALUES($1, $2, $3, $4, $5) RETURNING id',
-      values: [id, name, email, hashedPassword, role],
+      text: 'INSERT INTO users(id, name, email, password) VALUES($1, $2, $3, $4) RETURNING id',
+      values: [id, name, email, hashedPassword],
     };
 
     const result = await this._pool.query(query);
@@ -26,7 +26,6 @@ class UsersService {
     return result.rows[0].id;
   }
 
-  // Fungsi verifikasi email
   async verifyNewEmail(email) {
     const query = {
       text: 'SELECT email FROM users WHERE email = $1',
@@ -53,7 +52,7 @@ class UsersService {
 
   async getUserById(id) {
     const query = {
-      text: 'SELECT id, name, email, role FROM users WHERE id = $1',
+      text: 'SELECT id, name, email FROM users WHERE id = $1',
       values: [id],
     };
     const result = await this._pool.query(query);
@@ -62,7 +61,7 @@ class UsersService {
   }
 
   async getUsers() {
-    const result = await this._pool.query('SELECT id, name, email, role FROM users');
+    const result = await this._pool.query('SELECT id, name, email FROM users');
     return result.rows;
   }
 }

@@ -17,13 +17,11 @@ const profileApi = (usersService, applicationsService, bookmarksService) => {
         status: 'success',
         data: {
           id: user.id,
-          name: user.name || user.fullname,
-          fullname: user.fullname || user.name,
+          name: user.name,
           email: user.email,
           role: user.role,
-          user: user,
-          bookmarks: bookmarks, 
-          applications: applications 
+          bookmarks,
+          applications
         }
       });
     } catch (error) { 
