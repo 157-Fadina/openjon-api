@@ -1,4 +1,5 @@
 const express = require('express');
+const authMiddleware = require('../../middlewares/authMiddleware');
 
 const authenticationsApi = (authenticationsService, usersService, tokenManager, validator) => {
   const router = express.Router();
@@ -45,7 +46,7 @@ const authenticationsApi = (authenticationsService, usersService, tokenManager, 
     }
   });
 
-  router.delete('/', async (req, res, next) => {
+  router.delete('/', authMiddleware, async (req, res, next) => {
     try {
       validator.validateDeleteAuthenticationPayload(req.body);
 

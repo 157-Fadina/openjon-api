@@ -5,23 +5,28 @@ const jobsApi = (service, validator) => {
   const router = express.Router();
 
   router.post('/', authMiddleware, async (req, res, next) => {
-    try {
-      if (!req.body.title || !req.body.description) {
-        return res.status(400).json({ status: 'fail', message: 'Payload tidak lengkap' });
-      }
-      
-      req.body.companyId = req.body.companyId || req.body.company_id;
-      req.body.categoryId = req.body.categoryId || req.body.category_id;
+  try {
+    validator.validateJobPayload(req.body);
 
-      const jobId = await service.addJob(req.body);
-      res.status(201).json({
-        status: 'success', message: 'Pekerjaan berhasil ditambahkan',
-        data: { jobId: jobId, id: jobId, job: { id: jobId }, addedJob: { id: jobId } }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
+    req.body.companyId = req.body.companyId || req.body.company_id;
+    req.body.categoryId = req.body.categoryId || req.body.category_id;
+
+    const jobId = await service.addJob(req.body);
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Pekerjaan berhasil ditambahkan',
+      data: {
+        jobId: jobId,
+        id: jobId,
+        job: { id: jobId },
+        addedJob: { id: jobId }
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
   router.get('/', async (req, res, next) => {
     try {
@@ -67,6 +72,8 @@ const jobsApi = (service, validator) => {
 
   router.put('/:id', authMiddleware, async (req, res, next) => {
     try {
+      validator.validateJobPayload(req.body);
+      
       await service.getJobById(req.params.id);
       req.body.companyId = req.body.companyId || req.body.company_id;
       req.body.categoryId = req.body.categoryId || req.body.category_id;

@@ -1,7 +1,6 @@
-require('dotenv').config(); // Pindahkan ke paling atas
+require('dotenv').config();
 const express = require('express');
 
-// Import Services, Validators, dan API
 const UsersService = require('./services/postgres/UsersService');
 const UsersValidator = require('./validator/users');
 const usersApi = require('./api/users');
@@ -37,14 +36,12 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to OpenJob API V1' });
 });
 
-// Inisialisasi Service dan Validator
 const usersService = new UsersService();
-const usersValidator = UsersValidator; // PERBAIKAN: Hapus tanda kurung ()
+const usersValidator = UsersValidator;
 const authenticationsService = new AuthenticationsService();
-const authenticationsValidator = AuthenticationsValidator; // PERBAIKAN: Hapus tanda kurung ()
-// Pasang route users
+const authenticationsValidator = AuthenticationsValidator;
 const jobsService = new JobsService();
-const jobsValidator = JobsValidator; // Tanpa kurung
+const jobsValidator = JobsValidator; 
 const applicationsService = new ApplicationsService();
 const applicationsValidator = ApplicationsValidator;
 const bookmarksService = new BookmarksService();
@@ -54,25 +51,13 @@ const companiesValidator = CompaniesValidator;
 const categoriesService = new CategoriesService();
 const categoriesValidator = CategoriesValidator;
 
-// --- AREA PEMASANGAN RUTE ---
-
-// 1. Users & Auth
 app.use('/users', usersApi(usersService, usersValidator));
 app.use('/authentications', authenticationsApi(authenticationsService, usersService, TokenManager, authenticationsValidator));
-
-// 2. Companies & Categories (Daftar ini biasanya statis, taruh di atas)
 app.use('/companies', companiesApi(companiesService, companiesValidator));
 app.use('/categories', categoriesApi(categoriesService, categoriesValidator));
-
-// 3. Jobs (Pusat utama)
 app.use('/jobs', jobsApi(jobsService, jobsValidator));
-
-// 4. Bookmarks (Prefix /jobs sudah diatur di sini, 
-// pastikan di index bookmark cuma tinggal :jobId/bookmark)
 app.use('/jobs', bookmarksApi(bookmarksService, bookmarksValidator));
-app.use('/bookmarks', bookmarksApi(bookmarksService, bookmarksValidator)); // TAMBAHKAN BARIS INI!
-
-// 5. Applications, Profile & Docs
+app.use('/bookmarks', bookmarksApi(bookmarksService, bookmarksValidator));
 app.use('/applications', applicationsApi(applicationsService, applicationsValidator));
 app.use('/profile', profileApi(usersService, applicationsService, bookmarksService));
 app.use('/documents', documentsApi());
