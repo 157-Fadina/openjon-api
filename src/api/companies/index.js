@@ -59,11 +59,8 @@ const companiesApi = (service, validator) => {
   router.put('/:id', authMiddleware, async (req, res, next) => {
     try {
       const { id } = req.params;
-      
       await service.getCompanyById(id); 
-      
       validator.validateCompanyPayload(req.body); 
-      
       await service.editCompanyById(id, req.body);
 
       res.status(200).json({

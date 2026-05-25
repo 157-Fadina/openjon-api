@@ -11,9 +11,7 @@ const applicationsApi = (service, validator) => {
       };
 
       validator.validateApplicationPayload(payload);
-
       const { id: userId } = req.user; 
-      
       const applicationId = await service.addApplication(userId, payload.jobId);
 
       res.status(201).json({

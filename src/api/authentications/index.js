@@ -12,7 +12,6 @@ const authenticationsApi = (authenticationsService, usersService, tokenManager, 
 
       const accessToken = tokenManager.generateAccessToken({ id });
       const refreshToken = tokenManager.generateRefreshToken({ id });
-
       await authenticationsService.addRefreshToken(refreshToken);
 
       res.status(200).json({

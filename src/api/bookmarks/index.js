@@ -8,7 +8,6 @@ const bookmarksApi = (service) => {
     try {
       const { jobId } = req.params;
       const { id: userId } = req.user; 
-
       const bookmarkId = await service.addBookmark(userId, jobId);
 
       res.status(201).json({
