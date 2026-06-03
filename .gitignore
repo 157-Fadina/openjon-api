@@ -1,1 +1,2 @@
-.env/
+openjob_api/.env
+openjob_consumer/.env
