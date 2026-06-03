@@ -61,7 +61,7 @@ const init = async () => {
             subject: `Pemberitahuan: Lamaran Baru untuk ${data.job_title}`,
             html: `
               <div style="background-color: #121212; color: #e0e0e0; font-family: 'Courier New', Courier, monospace; padding: 40px; border: 4px solid #FF00FF; box-shadow: 6px 6px 0px #00FFFF;">
-                <h1 style="color: #00FFFF; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px #FF00FF;">⚡ KANDIDAT BARU ⚡</h1>
+                <h1 style="color: #00FFFF; text-transform: uppercase; letter-spacing: 2px; text-shadow: 2px 2px #FF00FF;">⚡ KANDIDAT BARU</h1>
                 <p style="font-size: 16px; line-height: 1.5;">Halo! Ada kandidat baru yang masuk untuk posisi <strong>${data.job_title}</strong> yang kamu pasang.</p>
                 <div style="background-color: #1e1e1e; padding: 20px; border-left: 5px solid #00FFFF; margin: 25px 0;">
                   <p style="margin: 5px 0;"><strong>Nama Pelamar:</strong> ${data.applicant_name}</p>
