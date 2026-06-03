@@ -3,8 +3,14 @@ const amqp = require('amqplib');
 const ProducerService = {
   sendMessage: async (queue, message) => {
     try {
-      // Wajib menggunakan process.env agar lolos pengujian reviewer Dicoding
-      const connection = await amqp.connect(process.env.RABBITMQ_SERVER);
+      // Merangkai koneksi menggunakan kredensial dari file .env
+      const connection = await amqp.connect({
+        hostname: process.env.RABBITMQ_HOST, // Sesuai .env
+        port: process.env.RABBITMQ_PORT,     // Sesuai .env
+        username: process.env.RABBITMQ_USER, // Sesuai .env
+        password: process.env.RABBITMQ_PASSWORD, // Sesuai .env
+      });
+      
       const channel = await connection.createChannel();
       
       await channel.assertQueue(queue, {

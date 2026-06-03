@@ -8,11 +8,11 @@ class CompaniesService {
     this._pool = new Pool();
   }
 
-  async addCompany({ name, description, location }) {
+  async addCompany({ name, description, location, ownerId }) {
     const id = `company-${nanoid(16)}`;
     const query = {
-      text: 'INSERT INTO companies (id, name, description, location) VALUES($1, $2, $3, $4) RETURNING id',
-      values: [id, name, description, location],
+      text: 'INSERT INTO companies (id, name, description, location, owner_id) VALUES($1, $2, $3, $4, $5) RETURNING id',
+      values: [id, name, description, location, ownerId], 
     };
 
     const result = await this._pool.query(query);

@@ -7,7 +7,12 @@ const companiesApi = (service, validator, cacheService) => {
   router.post('/', authMiddleware, async (req, res, next) => {
     try {
       validator.validateCompanyPayload(req.body);
-      const companyId = await service.addCompany(req.body);
+      const credentialId = req.user.id; 
+      
+      const companyId = await service.addCompany({
+        ...req.body,
+        ownerId: credentialId
+      });
 
       res.status(201).json({
         status: 'success',
