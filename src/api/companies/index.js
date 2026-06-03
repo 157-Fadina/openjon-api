@@ -1,7 +1,7 @@
 const express = require('express');
 const authMiddleware = require('../../middlewares/authMiddleware');
 
-const companiesApi = (service, validator) => {
+const companiesApi = (service, validator, cacheService) => { 
   const router = express.Router();
 
   router.post('/', authMiddleware, async (req, res, next) => {
@@ -39,18 +39,39 @@ const companiesApi = (service, validator) => {
   router.get('/:id', async (req, res, next) => {
     try {
       const { id } = req.params;
-      const company = await service.getCompanyById(id);
+      const cacheKey = `companies:${id}`;
 
-      res.status(200).json({
-        status: 'success',
-        data: {
-          id: company.id,
-          name: company.name,
-          description: company.description,
-          location: company.location,
-          company: company
-        }
-      });
+      try {
+        const cachedData = await cacheService.get(cacheKey);
+        const company = JSON.parse(cachedData);
+        
+        return res.status(200)
+          .set('X-Data-Source', 'cache')
+          .json({
+            status: 'success',
+            data: {
+              id: company.id,
+              name: company.name,
+              description: company.description,
+              location: company.location,
+              company: company
+            }
+          });
+      } catch (error) {
+        const company = await service.getCompanyById(id);        
+        await cacheService.set(cacheKey, JSON.stringify(company), 3600);
+
+        return res.status(200).json({
+          status: 'success',
+          data: {
+            id: company.id,
+            name: company.name,
+            description: company.description,
+            location: company.location,
+            company: company
+          }
+        });
+      }
     } catch (error) {
       next(error);
     }
@@ -62,6 +83,7 @@ const companiesApi = (service, validator) => {
       await service.getCompanyById(id); 
       validator.validateCompanyPayload(req.body); 
       await service.editCompanyById(id, req.body);
+      await cacheService.delete(`companies:${id}`);
 
       res.status(200).json({
         status: 'success',
@@ -76,6 +98,7 @@ const companiesApi = (service, validator) => {
     try {
       const { id } = req.params;
       await service.deleteCompanyById(id);
+      await cacheService.delete(`companies:${id}`);
 
       res.status(200).json({
         status: 'success',

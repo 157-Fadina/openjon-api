@@ -27,6 +27,9 @@ const companiesApi = require('./api/companies');
 const CategoriesService = require('./services/postgres/CategoriesService');
 const CategoriesValidator = require('./validator/categories');
 const categoriesApi = require('./api/categories');
+const DocumentsService = require('./services/postgres/DocumentsService');
+const CacheService = require('./services/redis/CacheService');
+const ProducerService = require('./services/rabbitmq/ProducerService');
 
 const app = express();
 app.use(express.json());
@@ -49,18 +52,20 @@ const bookmarksValidator = BookmarksValidator;
 const companiesService = new CompaniesService();
 const companiesValidator = CompaniesValidator;
 const categoriesService = new CategoriesService();
+const documentsService = new DocumentsService();
 const categoriesValidator = CategoriesValidator;
+const cacheService = new CacheService();
 
 app.use('/users', usersApi(usersService, usersValidator));
 app.use('/authentications', authenticationsApi(authenticationsService, usersService, TokenManager, authenticationsValidator));
-app.use('/companies', companiesApi(companiesService, companiesValidator));
+app.use('/companies', companiesApi(companiesService, companiesValidator, cacheService));
 app.use('/categories', categoriesApi(categoriesService, categoriesValidator));
 app.use('/jobs', jobsApi(jobsService, jobsValidator));
-app.use('/jobs', bookmarksApi(bookmarksService, bookmarksValidator));
-app.use('/bookmarks', bookmarksApi(bookmarksService, bookmarksValidator));
-app.use('/applications', applicationsApi(applicationsService, applicationsValidator));
+app.use('/jobs', bookmarksApi(bookmarksService, bookmarksValidator, cacheService));
+app.use('/bookmarks', bookmarksApi(bookmarksService, bookmarksValidator, cacheService));
+app.use('/applications', applicationsApi(applicationsService, applicationsValidator, cacheService, ProducerService));
 app.use('/profile', profileApi(usersService, applicationsService, bookmarksService));
-app.use('/documents', documentsApi());
+app.use('/documents', documentsApi(documentsService));
 
 app.use(errorHandler);
 

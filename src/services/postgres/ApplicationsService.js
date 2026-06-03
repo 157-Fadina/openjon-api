@@ -9,23 +9,24 @@ class ApplicationsService {
   }
 
   async addApplication(userId, jobId) {
+    const jobCheck = await this._pool.query('SELECT id FROM jobs WHERE id = $1', [jobId]);
+    if (!jobCheck.rowCount) {
+      throw new NotFoundError('Pekerjaan tidak ditemukan');
+    }
+
     const id = `application-${nanoid(16)}`;
     const query = {
       text: 'INSERT INTO applications (id, user_id, job_id) VALUES($1, $2, $3) RETURNING id',
       values: [id, userId, jobId],
     };
 
-    try {
-      const result = await this._pool.query(query);
-      
-      if (!result.rows[0].id) {
-        throw new InvariantError('Gagal melamar pekerjaan');
-      }
-
-      return result.rows[0].id;
-    } catch (error) {
-      throw new InvariantError('Gagal melamar pekerjaan. Pastikan ID pekerjaan valid.');
+    const result = await this._pool.query(query);
+    
+    if (!result.rows[0].id) {
+      throw new InvariantError('Gagal melamar pekerjaan');
     }
+
+    return result.rows[0].id;
   }
 
   async getApplicationsByUser(userId) {
