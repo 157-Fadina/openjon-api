@@ -1,20 +1,19 @@
 const express = require('express');
 const authMiddleware = require('../../middlewares/authMiddleware');
 
-const applicationsApi = (service, validator, cacheService, ProducerService) => {
+const applicationsApi = (service, validator, cacheService, producerService) => {
   const router = express.Router();
 
   router.post('/', authMiddleware, async (req, res, next) => {
   try {
     const { job_id } = req.body;
-    const { id: userId } = req.user; // Ini mengambil dari Token, BUKAN dari Body!
+    const { id: userId } = req.user;
 
     const payload = { jobId: job_id };
     validator.validateApplicationPayload(payload);
 
     const applicationId = await service.addApplication(userId, job_id);
     
-    // Kirim pesan ke RabbitMQ
     const message = JSON.stringify({ application_id: applicationId });
     await producerService.sendMessage('job_applications', message);
 
