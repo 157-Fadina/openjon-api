@@ -12,6 +12,7 @@ const usersApi = (service, validator) => {
         status: 'success',
         message: 'User berhasil ditambahkan',
         data: { 
+          addedUser: { id: UserId }, 
           userId: UserId,
           id: UserId
         },
@@ -29,12 +30,13 @@ const usersApi = (service, validator) => {
       res.status(200).json({
         status: 'success',
         data: {
-          id: user.id,            
-          name: user.name || user.fullname,
-          fullname: user.fullname || user.name,
-          email: user.email || user.username,
-          role: user.role,
-          user: user
+          user: {
+            id: user.id,            
+            name: user.name || user.fullname,
+            fullname: user.fullname || user.name,
+            email: user.email || user.username,
+            role: user.role
+          }
         }
       });
     } catch (error) {

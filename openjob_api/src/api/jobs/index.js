@@ -50,7 +50,7 @@ const jobsApi = (service, validator) => {
     res.status(200).json({
       status: 'success',
       data: {
-        ...job 
+        job: job
       }
     });
   } catch (error) { next(error); }
@@ -63,10 +63,15 @@ const jobsApi = (service, validator) => {
     } catch (error) { next(error); }
   });
 
-  router.get('/category/:categoryId', async (req, res, next) => {
+  router.get('/:id', async (req, res, next) => {
     try {
-      const jobs = await service.getJobsByCategoryId(req.params.categoryId);
-      res.status(200).json({ status: 'success', data: { jobs } });
+      const job = await service.getJobById(req.params.id);
+      res.status(200).json({
+        status: 'success',
+        data: {
+          job: job
+        }
+      });
     } catch (error) { next(error); }
   });
 

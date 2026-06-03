@@ -13,11 +13,14 @@ const applicationsApi = (service, validator, cacheService, producerService) => {
     validator.validateApplicationPayload(payload);
 
     const applicationId = await service.addApplication(userId, job_id);
+
+    await cacheService.delete(`applications:user:${userId}`);
+    await cacheService.delete(`applications:job:${job_id}`);
     
     const message = JSON.stringify({ application_id: applicationId });
     await producerService.sendMessage('job_applications', message);
 
-    res.status(201).json({ status: 'success', data: { id: applicationId } });
+    res.status(201).json({status: 'success',data: {id: applicationId,user_id: userId, job_id,status: 'pending'}});
   } catch (error) { next(error); }
 });
 
@@ -31,7 +34,7 @@ const applicationsApi = (service, validator, cacheService, producerService) => {
       } catch (error) {
         const application = await service.getApplicationById(id);
         await cacheService.set(cacheKey, JSON.stringify(application), 3600);
-        res.status(200).json({ status: 'success', data: { ...application } });
+        res.status(200).set('X-Data-Source', 'database').json({status: 'success',data: { ...application }});
       }
     } catch (error) { next(error); }
   });
@@ -46,7 +49,7 @@ const applicationsApi = (service, validator, cacheService, producerService) => {
       } catch (error) {
         const applications = await service.getApplicationsByUserId(userId);
         await cacheService.set(cacheKey, JSON.stringify(applications), 3600);
-        res.status(200).json({ status: 'success', data: { applications } });
+        res.status(200).set('X-Data-Source', 'database').json({status: 'success',data: { applications }});
       }
     } catch (error) { next(error); }
   });
@@ -61,7 +64,7 @@ const applicationsApi = (service, validator, cacheService, producerService) => {
       } catch (error) {
         const applications = await service.getApplicationsByJobId(jobId);
         await cacheService.set(cacheKey, JSON.stringify(applications), 3600);
-        res.status(200).json({ status: 'success', data: { applications } });
+        res.status(200).set('X-Data-Source', 'database').json({ status: 'success', data: { applications } });
       }
     } catch (error) { next(error); }
   });
