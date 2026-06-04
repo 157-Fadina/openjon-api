@@ -23,26 +23,23 @@ const usersApi = (service, validator) => {
   });
 
   router.get('/:id', async (req, res, next) => {
-    try {
-      const { id } = req.params;
-      const user = await service.getUserById(id);
-      
-      res.status(200).json({
-        status: 'success',
-        data: {
-          user: {
-            id: user.id,            
-            name: user.name || user.fullname,
-            fullname: user.fullname || user.name,
-            email: user.email || user.username,
-            role: user.role
-          }
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
+  try {
+    const { id } = req.params;
+    const user = await service.getUserById(id);
+
+    res.status(200).json({
+      status: 'success',
+      data: {
+        id: user.id,
+        name: user.name || user.fullname,
+        fullname: user.fullname || user.name,
+        email: user.email || user.username,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
   router.get('/', async (req, res, next) => {
     try {

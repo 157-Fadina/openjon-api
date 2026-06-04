@@ -22,6 +22,46 @@ class DocumentsService {
 
     return result.rows[0].id;
   }
+
+  async getDocuments() {
+  const query = {
+    text: 'SELECT id, file_name, path FROM documents',
+  };
+
+  const result = await this._pool.query(query);
+
+  return result.rows;
 }
+
+  async getDocumentById(id) {
+    const query = {
+      text: 'SELECT id, file_name, path FROM documents WHERE id = $1',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Dokumen tidak ditemukan');
+    }
+
+    return result.rows[0];
+  }
+
+  async deleteDocumentById(id) {
+    const query = {
+      text: 'DELETE FROM documents WHERE id = $1 RETURNING id',
+      values: [id],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new InvariantError('Dokumen tidak ditemukan');
+    }
+  }
+}
+
+
 
 module.exports = DocumentsService;

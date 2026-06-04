@@ -39,12 +39,12 @@ const documentsApi = (documentsService) => {
     uploadSingle(req, res, (err) => {
       if (err) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          return res.status(400).json({ status: 'fail', message: 'Ukuran berkas maksimal 5 MB' });
+          return res.status(400).json({ status: 'failed', message: 'Ukuran berkas maksimal 5 MB' });
         }
         if (err.message === 'INVALID_TYPE') {
-          return res.status(400).json({ status: 'fail', message: 'Hanya file PDF yang diperbolehkan!' });
+          return res.status(400).json({ status: 'failed', message: 'Hanya file PDF yang diperbolehkan!' });
         }
-        return res.status(400).json({ status: 'fail', message: 'Terjadi kesalahan saat upload' });
+        return res.status(400).json({ status: 'failed', message: 'Terjadi kesalahan saat upload' });
       }
       next();
     });
@@ -54,24 +54,23 @@ const documentsApi = (documentsService) => {
     try {
       if (!req.file) {
         return res.status(400).json({ 
-          status: 'fail', 
-          message: 'File dokumen tidak ditemukan' 
+          status: 'failed', 
+          message: 'Document file is required' 
         });
       }
 
       const fileName = req.file.filename;
       const filePath = `/uploads/${fileName}`;
-
       const documentId = await documentsService.addDocument(fileName, filePath);
-
       const fileUrl = `${req.protocol}://${req.get('host')}${filePath}`;
 
       res.status(201).json({
         status: 'success',
-        message: 'Dokumen berhasil diunggah',
-        data: { 
-          id: documentId,
-          fileUrl 
+        data: {
+          documentId,
+          filename: req.file.filename,
+          originalName: req.file.originalname,
+          size: req.file.size,
         },
       });
     } catch (error) {
@@ -79,13 +78,52 @@ const documentsApi = (documentsService) => {
     }
   });
 
-  router.delete('/:id', authMiddleware, (req, res) => {
+  router.get('/', async (req, res, next) => {
+  try {
+    const documents = await documentsService.getDocuments();
+
     res.status(200).json({
       status: 'success',
-      message: 'Dokumen berhasil dihapus',
+      data: {
+        documents,
+      },
     });
-  });
+  } catch (error) {
+    next(error);
+  }
+});
 
+router.get('/:id', async (req, res, next) => {
+  try {
+    const document = await documentsService.getDocumentById(req.params.id);
+
+    const filePath = path.resolve('uploads', document.file_name);
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${document.file_name}"`
+    );
+
+    res.type('application/pdf');
+    res.sendFile(filePath);
+  } catch (error) {
+    next(error);
+  }
+});
+
+  router.delete('/:id', authMiddleware, async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      await documentsService.deleteDocumentById(id);
+      res.status(200).json({
+        status: 'success',
+        message: 'Dokumen berhasil dihapus',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+    
   return router;
 };
 
