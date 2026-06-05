@@ -44,7 +44,7 @@ const documentsApi = (documentsService) => {
         if (err.message === 'INVALID_TYPE') {
           return res.status(400).json({ status: 'failed', message: 'File is required' });
         }
-        return res.status(400).json({ status: 'failed', message: 'Terjadi kesalahan saat upload' });
+        return res.status(400).json({ status: 'failed', message: 'File is required' });
       }
       next();
     });
