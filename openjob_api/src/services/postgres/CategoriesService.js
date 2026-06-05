@@ -23,13 +23,13 @@ class CategoriesService {
   }
 
   async getCategories() {
-    const result = await this._pool.query('SELECT id, name FROM categories');
+    const result = await this._pool.query('SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt" FROM categories');
     return result.rows;
   }
 
   async getCategoryById(id) {
     const query = {
-      text: 'SELECT id, name FROM categories WHERE id = $1',
+      text: 'SELECT id, name, created_at AS "createdAt", updated_at AS "updatedAt" FROM categories WHERE id = $1',
       values: [id],
     };
     const result = await this._pool.query(query);

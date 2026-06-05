@@ -4,18 +4,14 @@ exports.shorthands = undefined;
 
 exports.up = (pgm) => {
   pgm.createTable('jobs', {
-    id: {
-      type: 'VARCHAR(50)',
-      primaryKey: true,
-    },
-    title: {
-      type: 'TEXT',
-      notNull: true,
-    },
-    description: {
-      type: 'TEXT',
-      notNull: true,
-    },
+    id: { type: 'VARCHAR(50)', primaryKey: true },
+    title: { type: 'TEXT', notNull: true },
+    description: { type: 'TEXT', notNull: true },
+    salary: { type: 'INTEGER' },
+    location: { type: 'TEXT' },
+    requirements: { type: 'TEXT' },
+    job_type: { type: 'TEXT' },
+
     company_id: {
       type: 'VARCHAR(50)',
       notNull: true,

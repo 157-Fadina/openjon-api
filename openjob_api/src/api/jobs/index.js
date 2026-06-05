@@ -5,28 +5,26 @@ const jobsApi = (service, validator) => {
   const router = express.Router();
 
   router.post('/', authMiddleware, async (req, res, next) => {
-  try {
-    validator.validateJobPayload(req.body);
+    try {
+      validator.validateJobPayload(req.body);
 
-    req.body.companyId = req.body.companyId || req.body.company_id;
-    req.body.categoryId = req.body.categoryId || req.body.category_id;
+      req.body.companyId = req.body.companyId || req.body.company_id;
+      req.body.categoryId = req.body.categoryId || req.body.category_id;
 
-    const jobId = await service.addJob(req.body);
+      const jobId = await service.addJob(req.body);
 
-    res.status(201).json({
-      status: 'success',
-      message: 'Pekerjaan berhasil ditambahkan',
-      data: {
-        jobId: jobId,
-        id: jobId,
-        job: { id: jobId },
-        addedJob: { id: jobId }
-      }
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+      res.status(201).json({
+        status: 'success',
+        message: 'Pekerjaan berhasil ditambahkan',
+        data: {
+          jobId: jobId,
+          id: jobId
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 
   router.get('/', async (req, res, next) => {
     try {
@@ -35,30 +33,21 @@ const jobsApi = (service, validator) => {
 
       res.status(200).json({
         status: 'success',
-        data: {
-          jobs: jobs
-        }
+        data: { jobs }
       });
-    } catch (error) {
-      next(error);
-    }
+    } catch (error) { next(error); }
   });
-
-  router.get('/:id', async (req, res, next) => {
-  try {
-    const job = await service.getJobById(req.params.id);
-    res.status(200).json({
-      status: 'success',
-      data: {
-        job: job
-      }
-    });
-  } catch (error) { next(error); }
-});
 
   router.get('/company/:companyId', async (req, res, next) => {
     try {
       const jobs = await service.getJobsByCompanyId(req.params.companyId);
+      res.status(200).json({ status: 'success', data: { jobs } });
+    } catch (error) { next(error); }
+  });
+
+  router.get('/category/:categoryId', async (req, res, next) => {
+    try {
+      const jobs = await service.getJobsByCategoryId(req.params.categoryId);
       res.status(200).json({ status: 'success', data: { jobs } });
     } catch (error) { next(error); }
   });
@@ -68,9 +57,7 @@ const jobsApi = (service, validator) => {
       const job = await service.getJobById(req.params.id);
       res.status(200).json({
         status: 'success',
-        data: {
-          job: job
-        }
+        data: job
       });
     } catch (error) { next(error); }
   });
@@ -78,10 +65,11 @@ const jobsApi = (service, validator) => {
   router.put('/:id', authMiddleware, async (req, res, next) => {
     try {
       validator.validateJobPayload(req.body);
-      
       await service.getJobById(req.params.id);
+      
       req.body.companyId = req.body.companyId || req.body.company_id;
       req.body.categoryId = req.body.categoryId || req.body.category_id;
+      
       await service.editJobById(req.params.id, req.body);
       res.status(200).json({ status: 'success', message: 'Pekerjaan berhasil diperbarui' });
     } catch (error) {
@@ -99,4 +87,5 @@ const jobsApi = (service, validator) => {
 
   return router;
 };
+
 module.exports = jobsApi;

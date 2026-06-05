@@ -24,6 +24,19 @@ const applicationsApi = (service, validator, cacheService, producerService) => {
   } catch (error) { next(error); }
 });
 
+router.get('/', authMiddleware, async (req, res, next) => {
+    try {
+      const applications = await service.getApplications();
+      
+      res.status(200).json({
+        status: 'success',
+        data: { applications }
+      });
+    } catch (error) { 
+      next(error); 
+    }
+  });
+
   router.get('/:id', authMiddleware, async (req, res, next) => {
     try {
       const { id } = req.params;

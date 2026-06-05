@@ -68,7 +68,9 @@ const companiesApi = (service, validator, cacheService) => {
         const company = await service.getCompanyById(id);        
         await cacheService.set(cacheKey, JSON.stringify(company), 3600);
 
-        return res.status(200).json({
+        return res.status(200)
+        .set('X-Data-Source', 'database') 
+        .json({
           status: 'success',
           data: {
             id: company.id,

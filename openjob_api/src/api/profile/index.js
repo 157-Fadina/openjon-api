@@ -10,7 +10,7 @@ const profileApi = (usersService, applicationsService, bookmarksService) => {
       const [user, bookmarks, applications] = await Promise.all([
         usersService.getUserById(userId),
         bookmarksService.getBookmarksByUserId(userId),
-        applicationsService.getApplicationsByUser(userId)
+        applicationsService.getApplicationsByUserId(userId)
       ]);
 
       res.status(200).json({
@@ -32,7 +32,7 @@ const profileApi = (usersService, applicationsService, bookmarksService) => {
   router.get('/applications', authMiddleware, async (req, res, next) => {
     try {
       const userId = req.user.id;
-      const applications = await applicationsService.getApplicationsByUser(userId);
+      const applications = await applicationsService.getApplicationsByUserId(userId);
 
       res.status(200).json({
         status: 'success',

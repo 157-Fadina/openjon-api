@@ -1,6 +1,6 @@
 const express = require('express');
 
-const usersApi = (service, validator) => {
+const usersApi = (service, validator, cacheService) => {
   const router = express.Router();
 
   router.post('/', async (req, res, next) => {
@@ -23,23 +23,29 @@ const usersApi = (service, validator) => {
   });
 
   router.get('/:id', async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const user = await service.getUserById(id);
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        id: user.id,
-        name: user.name || user.fullname,
-        fullname: user.fullname || user.name,
-        email: user.email || user.username,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+    try {
+      const { id } = req.params;      
+      try {
+        const cachedData = await cacheService.get(`users:${id}`);
+        const user = JSON.parse(cachedData);
+        return res.status(200)
+          .set('X-Data-Source', 'cache')
+          .json({ status: 'success', data: { user } });
+      } catch (cacheError) {
+        const user = await service.getUserById(id);        
+        await cacheService.set(`users:${id}`, JSON.stringify(user), 3600);
+        
+        return res.status(200)
+          .set('X-Data-Source', 'database')
+          .json({ 
+            status: 'success', 
+            data: { user } 
+          });
+      }
+    } catch (error) {
+      next(error); 
+    }
+  });
 
   router.get('/', async (req, res, next) => {
     try {

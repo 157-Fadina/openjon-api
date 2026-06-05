@@ -23,19 +23,22 @@ class CompaniesService {
   }
 
   async getCompanies() {
-    const result = await this._pool.query('SELECT id, name, description, location FROM companies');
+    const result = await this._pool.query('SELECT id, name, description, location, created_at AS "createdAt", updated_at AS "updatedAt" FROM companies');
     return result.rows;
   }
 
   async getCompanyById(id) {
     const query = {
-      text: 'SELECT id, name, description, location FROM companies WHERE id = $1',
+      text: 'SELECT id, name, description, location, created_at AS "createdAt", updated_at AS "updatedAt" FROM companies WHERE id = $1',
       values: [id],
     };
+    
     const result = await this._pool.query(query);
+    
     if (!result.rows.length) {
       throw new NotFoundError('Perusahaan tidak ditemukan');
     }
+    
     return result.rows[0];
   }
 

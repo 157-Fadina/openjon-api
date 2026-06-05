@@ -56,7 +56,12 @@ const documentsService = new DocumentsService();
 const categoriesValidator = CategoriesValidator;
 const cacheService = new CacheService();
 
-app.use('/users', usersApi(usersService, usersValidator));
+app.use((req, res, next) => {
+  res.header("Access-Control-Expose-Headers", "X-Data-Source");
+  next();
+});
+
+app.use('/users', usersApi(usersService, usersValidator, cacheService));
 app.use('/authentications', authenticationsApi(authenticationsService, usersService, TokenManager, authenticationsValidator));
 app.use('/companies', companiesApi(companiesService, companiesValidator, cacheService));
 app.use('/categories', categoriesApi(categoriesService, categoriesValidator));

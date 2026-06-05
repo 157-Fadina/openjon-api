@@ -39,7 +39,7 @@ const documentsApi = (documentsService) => {
     uploadSingle(req, res, (err) => {
       if (err) {
         if (err.code === 'LIMIT_FILE_SIZE') {
-          return res.status(400).json({ status: 'failed', message: 'Ukuran berkas maksimal 5 MB' });
+          return res.status(400).json({ status: 'failed', message: 'Upload a valid PDF file (max 5MB)' });
         }
         if (err.message === 'INVALID_TYPE') {
           return res.status(400).json({ status: 'failed', message: 'File is required' });
@@ -55,7 +55,7 @@ const documentsApi = (documentsService) => {
       if (!req.file) {
         return res.status(400).json({ 
           status: 'failed', 
-          message: 'Document file is required' 
+          message: 'File is required' 
         });
       }
 
