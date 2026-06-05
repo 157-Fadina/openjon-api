@@ -95,17 +95,11 @@ const documentsApi = (documentsService) => {
 
 router.get('/:id', async (req, res, next) => {
   try {
+    const path = require('path');
     const document = await documentsService.getDocumentById(req.params.id);
+    const filePath = path.resolve(__dirname, `../../../uploads/${document.file_name}`);
 
-    const filePath = path.resolve('uploads', document.file_name);
-
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename="${document.file_name}"`
-    );
-
-    res.type('application/pdf');
-    res.sendFile(filePath);
+    return res.download(filePath, document.file_name); 
   } catch (error) {
     next(error);
   }

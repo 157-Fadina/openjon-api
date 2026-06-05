@@ -81,25 +81,6 @@ class ApplicationsService {
     return result.rows[0];
   }
 
-  async getApplicationsByUserId(userId) {
-    const query = {
-      text: `
-        SELECT 
-          applications.id, applications.user_id, applications.job_id, applications.status,
-          applications.created_at AS "createdAt", applications.updated_at AS "updatedAt",
-          jobs.title, jobs.description, jobs.salary, jobs.location, jobs.requirements, jobs.job_type AS "jobType",
-          companies.name AS "companyName"
-        FROM applications
-        LEFT JOIN jobs ON applications.job_id = jobs.id
-        LEFT JOIN companies ON jobs.company_id = companies.id
-        WHERE applications.user_id = $1
-      `,
-      values: [userId],
-    };
-    const result = await this._pool.query(query);
-    return result.rows;
-  }
-
   async getApplicationsByJobId(jobId) {
     const query = {
       text: `
@@ -108,7 +89,7 @@ class ApplicationsService {
           applications.created_at AS "createdAt", applications.updated_at AS "updatedAt",
           jobs.title, jobs.description, jobs.salary, jobs.location, jobs.requirements, jobs.job_type AS "jobType",
           jobs.company_id AS "companyId",
-          jobs.category_id AS "categoryId"
+          jobs.category_id AS "categoryId",
           companies.name AS "companyName"
         FROM applications
         LEFT JOIN jobs ON applications.job_id = jobs.id
@@ -116,6 +97,27 @@ class ApplicationsService {
         WHERE applications.job_id = $1
       `,
       values: [jobId],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
+
+  async getApplicationsByUserId(userId) {
+    const query = {
+      text: `
+        SELECT 
+          applications.id, applications.user_id, applications.job_id, applications.status,
+          applications.created_at AS "createdAt", applications.updated_at AS "updatedAt",
+          jobs.title, jobs.description, jobs.salary, jobs.location, jobs.requirements, jobs.job_type AS "jobType",
+          jobs.company_id AS "companyId",   -- TAMBAHKAN DI SINI
+          jobs.category_id AS "categoryId", -- TAMBAHKAN DI SINI
+          companies.name AS "companyName"
+        FROM applications
+        LEFT JOIN jobs ON applications.job_id = jobs.id
+        LEFT JOIN companies ON jobs.company_id = companies.id
+        WHERE applications.user_id = $1
+      `,
+      values: [userId],
     };
     const result = await this._pool.query(query);
     return result.rows;

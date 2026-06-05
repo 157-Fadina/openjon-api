@@ -22,6 +22,26 @@ const usersApi = (service, validator, cacheService) => {
     }
   });
 
+  
+  router.get('/', async (req, res, next) => {
+    try {
+      const users = await service.getUsers();
+      res.status(200).json({
+        status: 'success',
+        data: {
+          users: users.map((user) => ({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+          })),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.get('/:id', async (req, res, next) => {
     try {
       const { id } = req.params;      
@@ -39,30 +59,11 @@ const usersApi = (service, validator, cacheService) => {
           .set('X-Data-Source', 'database')
           .json({ 
             status: 'success', 
-            data: { user } 
+            data: user 
           });
       }
     } catch (error) {
       next(error); 
-    }
-  });
-
-  router.get('/', async (req, res, next) => {
-    try {
-      const users = await service.getUsers();
-      res.status(200).json({
-        status: 'success',
-        data: {
-          users: users.map((user) => ({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role
-          })),
-        },
-      });
-    } catch (error) {
-      next(error);
     }
   });
 
