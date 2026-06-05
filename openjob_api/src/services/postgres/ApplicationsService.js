@@ -107,6 +107,8 @@ class ApplicationsService {
           applications.id, applications.user_id, applications.job_id, applications.status,
           applications.created_at AS "createdAt", applications.updated_at AS "updatedAt",
           jobs.title, jobs.description, jobs.salary, jobs.location, jobs.requirements, jobs.job_type AS "jobType",
+          jobs.company_id AS "companyId",
+          jobs.category_id AS "categoryId"
           companies.name AS "companyName"
         FROM applications
         LEFT JOIN jobs ON applications.job_id = jobs.id

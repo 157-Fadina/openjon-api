@@ -30,7 +30,7 @@ const usersApi = (service, validator, cacheService) => {
         const user = JSON.parse(cachedData);
         return res.status(200)
           .set('X-Data-Source', 'cache')
-          .json({ status: 'success', data: { user } });
+          .json({ status: 'success', data: user });
       } catch (cacheError) {
         const user = await service.getUserById(id);        
         await cacheService.set(`users:${id}`, JSON.stringify(user), 3600);

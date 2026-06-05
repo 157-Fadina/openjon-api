@@ -50,10 +50,13 @@ const bookmarksApi = (service, validator, cacheService) => {
           .set('X-Data-Source', 'cache')
           .json({ status: 'success', data: { bookmarks: JSON.parse(cachedData) } });
       } catch (error) {
-        const bookmarks = await service.getBookmarksByUserId(userId);
-        await cacheService.set(cacheKey, JSON.stringify(bookmarks), 3600);
-        res.status(200).json({ status: 'success', data: { bookmarks } });
-      }
+      const bookmarks = await service.getBookmarksByUserId(userId);
+      await cacheService.set(cacheKey, JSON.stringify(bookmarks), 3600);
+      
+      return res.status(200)
+        .set('X-Data-Source', 'database') 
+        .json({ status: 'success', data: { bookmarks } });
+    }
     } catch (error) { next(error); }
   });
 
