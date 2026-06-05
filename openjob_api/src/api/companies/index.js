@@ -14,6 +14,8 @@ const companiesApi = (service, validator, cacheService) => {
         ownerId: credentialId
       });
 
+      
+
       res.status(201).json({
         status: 'success',
         message: 'Perusahaan berhasil ditambahkan',
@@ -89,6 +91,7 @@ const companiesApi = (service, validator, cacheService) => {
       validator.validateCompanyPayload(req.body); 
       await service.editCompanyById(id, req.body);
       await cacheService.delete(`companies:${id}`);
+      await cacheService.delete('companies');
 
       res.status(200).json({
         status: 'success',
@@ -104,6 +107,7 @@ const companiesApi = (service, validator, cacheService) => {
       const { id } = req.params;
       await service.deleteCompanyById(id);
       await cacheService.delete(`companies:${id}`);
+      await cacheService.delete('companies');
 
       res.status(200).json({
         status: 'success',

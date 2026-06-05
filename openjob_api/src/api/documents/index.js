@@ -42,7 +42,7 @@ const documentsApi = (documentsService) => {
           return res.status(400).json({ status: 'failed', message: 'Ukuran berkas maksimal 5 MB' });
         }
         if (err.message === 'INVALID_TYPE') {
-          return res.status(400).json({ status: 'failed', message: 'Hanya file PDF yang diperbolehkan!' });
+          return res.status(400).json({ status: 'failed', message: 'File is required' });
         }
         return res.status(400).json({ status: 'failed', message: 'Terjadi kesalahan saat upload' });
       }
